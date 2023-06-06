@@ -36,4 +36,4 @@ jobs:
           apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
           accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
           projectName: onboarding
-          directory: dist
+          directory: start-usage/dist
