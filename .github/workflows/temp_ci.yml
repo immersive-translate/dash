@@ -74,6 +74,8 @@ jobs:
         run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/immersive-translate public-repo
         env:
           PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      - name: ls
+        run: ls -l /home/runner/work/dash/dash/dist/
       - name: upload userscript to cloudflare r2
         if: steps.check_version.outcome == 'success'
         run: make uploadtocloudflare
