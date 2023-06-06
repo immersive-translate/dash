@@ -1,0 +1,39 @@
+name: Deploy Start Usage
+on:
+  # Trigger the workflow every time you push to the `main` branch
+  # Using a different branch name? Replace `main` with your branch’s name
+  # Allows you to run this workflow manually from the Actions tab on GitHub.
+  workflow_dispatch:
+
+  repository_dispatch:
+    types:
+      - deply-start-site
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 'start-usage' # Here the path to the folder where package-lock.json is located.
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: immersive-translate/site
+          # ref: official
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      # - run: cd ./start-usage && pwd && ls -a
+      - run: pwd
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: ./start-usage/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@v1 
+        with:
+          apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
+          accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
+          projectName: onboarding
+          directory: dist
