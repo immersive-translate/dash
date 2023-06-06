@@ -18,8 +18,7 @@ jobs:
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
       - name: checkout to main and merge
         run: |
-          git checkout main
-          git merge move-domain
+          git checkout -b main
 
       #https://stackoverflow.com/questions/61919141/read-json-file-in-github-actions
       - id: set_var
