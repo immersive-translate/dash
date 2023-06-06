@@ -12,7 +12,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-        ref:  move-domain
+        with:
+          ref:  move-domain
       - name: checkout to main and merge
         run: |
           git checkout main
