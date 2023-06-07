@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   repository_dispatch:
     types:
-      - deply-official-site
+      - deploy-official-site 
 jobs:
   deploy:
     name: Deploy to Cloudfalre Pages
