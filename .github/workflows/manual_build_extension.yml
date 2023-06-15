@@ -131,6 +131,10 @@ jobs:
     if: github.event.inputs.safari == '1'
     steps:
       - uses: actions/checkout@v3
+        with:
+          repository: immersive-translate/next-translator
+          # ref: official
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
@@ -153,7 +157,17 @@ jobs:
           APPLE_ISSUER_ID: ${{ secrets.APPLE_ISSUER_ID }}
           APPLE_KEY_ID: ${{ secrets.APPLE_KEY_ID }}
           APPLE_KEY_BASE64: ${{ secrets.APPLE_KEY_BASE64 }}
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      # push to repo
+      - name: Commit files
+        if: steps.check_version.outcome == 'success'
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git commit -m "update dist" -a
+          git remote -v
+          git push
+
+      # - name: Create Pull Request
+      #   uses: peter-evans/create-pull-request@v5
+      #   with:
+      #     token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
