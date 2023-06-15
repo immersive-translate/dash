@@ -1,0 +1,159 @@
+name: Manual release
+on:
+  workflow_dispatch:
+    inputs:
+      firefox:
+        default: "0"
+        description: "is publish to firefox"
+        type: string
+        required: false
+      edge:
+        default: "0"
+        description: "is publish to edge"
+        type: string
+        required: false
+      chrome:
+        default: "0"
+        description: "is publish to chrome"
+        type: string
+        required: false
+      safari:
+        default: "0"
+        description: "is publish to safari"
+        type: string
+        required: false
+  # push:
+  #   branches:
+  #     - safari-ci-test
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    concurrency: manual-build
+    if: github.event.inputs.chrome == '1' || github.event.inputs.firefox == '1' || github.event.inputs.edge == '1'
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+        with:
+          repository: immersive-translate/next-translator
+          # ref: official
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      #https://stackoverflow.com/questions/61919141/read-json-file-in-github-actions
+      - id: set_var
+        run: |
+          content=`cat ./manifest.json`
+          echo "::set-output name=version::$(echo $content | jq -r '.version')"
+      # check version is 3 digits x.x.1-9 or x.x.0
+      - name: Check version
+        id: check_version
+        continue-on-error: true
+        run: |
+          if [[ "${{ github.event.inputs.force  }}" == "1" ]]; then
+            echo "force to publish"
+          elif [[ "${{ steps.set_var.outputs.version }}" =~ ^[0-9]+\.[0-9]+\.[1-9][0-9]*$ ]]; then
+            echo "Version is nightly"
+          else
+            echo "Version is release"
+          fi
+      - name: Setup Deno
+        if: steps.check_version.outcome == 'success'
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.31.1
+      # - uses: actions/setup-node@v3
+      #   if: steps.check_version.outcome == 'success'
+      #   with:
+      #     node-version: '16.x'
+      #     registry-url: 'https://registry.npmjs.org'
+      - name: Test
+        if: steps.check_version.outcome == 'success'
+        run: make test
+      - name: Build
+        if: steps.check_version.outcome == 'success'
+        run: make prod-buildall
+      - run: make zipsource
+      # - name: Add Version to folders
+      #   if: steps.check_version.outcome == 'success'
+      #   run: |
+      #     cp dist/chrome.zip dist/chrome-immersive-translate-${{ steps.set_var.outputs.version }}.zip
+      #     cp dist/firefox.zip dist/firefox-immersive-translate-${{ steps.set_var.outputs.version }}.zip
+
+      # - name: "web-ext build"
+      #   id: web-ext-build
+      #   if: steps.check_version.outcome == 'success' && github.event.inputs.firefox == '1'
+      #   uses: kewisch/action-web-ext@v1
+      #   with:
+      #     cmd: build
+      #     source: dist/firefox
+      #     filename: "firefox-{name}-{version}.xpi"
+      # - name: "web-ext sign"
+      #   if: steps.check_version.outcome == 'success' && github.event.inputs.firefox == '1'
+      #   id: web-ext-sign
+      #   uses: kewisch/action-web-ext@v1
+      #   with:
+      #     cmd: sign
+      #     source: ${{ steps.web-ext-build.outputs.target }}
+      #     channel: listed
+      #     apiKey: ${{ secrets.FIREFOX_API_KEY }}
+      #     apiSecret: ${{ secrets.FIREFOX_API_SECRET }}
+      #     timeout: 900000
+
+      - uses: cardinalby/webext-buildtools-firefox-addons-action@v1
+        if: steps.check_version.outcome == 'success' && github.event.inputs.firefox == '1'
+        name: submit to firefox
+        with:
+          zipFilePath: "dist/firefox_store.zip"
+          sourcesZipFilePath: "dist/immersive-translate-source.zip"
+          extensionId: "{5efceaa7-f3a2-4e59-a54b-85319448e305}"
+          jwtIssuer: ${{ secrets.FIREFOX_API_KEY }}
+          jwtSecret: ${{ secrets.FIREFOX_API_SECRET }}
+      - uses: wdzeng/edge-addon@v1
+        if: steps.check_version.outcome == 'success' && github.event.inputs.edge == '1'
+        with:
+          product-id: d49a3368-918f-446f-8d8b-4dadb0f08e8e
+          zip-path: dist/edge_store.zip
+          client-id: ${{ secrets.EDGE_CLIENT_ID }}
+          client-secret: ${{ secrets.EDGE_CLIENT_SECRET }}
+          access-token-url: ${{ secrets.EDGE_ACCESS_TOKEN_URL }}
+
+      - name: Upload & release to chrome store
+        uses: mnao305/chrome-extension-upload@v4.0.1
+        if: steps.check_version.outcome == 'success' && github.event.inputs.chrome == '1'
+        with:
+          file-path: dist/chrome_store.zip
+          extension-id: bpoadfkcbjbfhfodiogcnhhhpibjhbnh
+          client-id: ${{ secrets.GOOGLE_CLIENT_ID }}
+          client-secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+  safari:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    concurrency: safari-build
+    if: github.event.inputs.safari == '1'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.0"
+          bundler-cache: true
+          working-directory: "./safari/Immersive Translate"
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.31.1
+      - name: Test
+        run: make test
+      - run: make testflight
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{secrets.MATCH_GIT_BASIC_AUTHORIZATION}}
+          APPLE_ISSUER_ID: ${{ secrets.APPLE_ISSUER_ID }}
+          APPLE_KEY_ID: ${{ secrets.APPLE_KEY_ID }}
+          APPLE_KEY_BASE64: ${{ secrets.APPLE_KEY_BASE64 }}
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}

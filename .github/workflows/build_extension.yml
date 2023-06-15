@@ -1,0 +1,234 @@
+name: extension nightly release
+on:
+  workflow_dispatch:
+    inputs:
+      edge:
+        default: "0"
+        description: "is publish to edge"
+        type: string
+        required: false
+      chrome:
+        default: "0"
+        description: "is publish to chrome"
+        type: string
+        required: false
+  repository_dispatch:
+    types:
+      - build-nightly-extension
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    concurrency: nightly-build
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+        with:
+          repository: immersive-translate/next-translator
+          # ref: official
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      #https://stackoverflow.com/questions/61919141/read-json-file-in-github-actions
+      - id: set_var
+        run: |
+          content=`cat ./manifest.json`
+          echo "::set-output name=version::$(echo $content | jq -r '.version')"
+      - name: Check version
+        id: check_version
+        continue-on-error: true
+        run: |
+          if [[ "${{ steps.set_var.outputs.version }}" =~ ^[0-9]+\.[0-9]+\.[1-9][0-9]*$ ]]; then
+            echo "Version is nightly"
+          else
+            echo "Version is release"
+            # exit 1
+          fi
+      - name: Setup Deno
+        if: steps.check_version.outcome == 'success'
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.31.1
+      # - uses: actions/setup-node@v3
+      #   if: steps.check_version.outcome == 'success'
+      #   with:
+      #     node-version: '16.x'
+      #     registry-url: 'https://registry.npmjs.org'
+      # check version is 3 digits x.x.1-9 or x.x.0
+      - name: Test
+        if: steps.check_version.outcome == 'success'
+        run: make test
+      - name: Build for release zip file
+        if: steps.check_version.outcome == 'success'
+        run: RELEASE_ZIP=1 make prod-buildzip
+      - name: Add Version to folders
+        if: steps.check_version.outcome == 'success'
+        run: |
+          cp dist/chrome.zip dist/chrome-immersive-translate-${{ steps.set_var.outputs.version }}.zip
+          cp dist/firefox.zip dist/firefox-immersive-translate-${{ steps.set_var.outputs.version }}.zip
+
+      - name: upload userscript to cloudflare r2
+        if: steps.check_version.outcome == 'success'
+        run: make uploadtocloudflare
+        env:
+          CLOUFLARE_AWS_ACCESS_KEY_ID: ${{ secrets.CLOUFLARE_AWS_ACCESS_KEY_ID }}
+          CLOUFLARE_AWS_SECRET_ACCESS_KEY: ${{ secrets.CLOUFLARE_AWS_SECRET_ACCESS_KEY }}
+          VERSION: ${{ steps.set_var.outputs.version }}
+      - name: Clone public app repo
+        if: steps.check_version.outcome == 'success'
+        run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/app repo
+        env:
+          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+
+      - name: Clone public dash repo
+        if: steps.check_version.outcome == 'success'
+        run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/dash dash-repo
+        env:
+          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+
+      - name: Clone public repo
+        if: steps.check_version.outcome == 'success'
+        run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/immersive-translate public-repo
+        env:
+          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+
+      - name: publish options to dash
+        run: make movetodash
+      - name: publish to app
+        if: steps.check_version.outcome == 'success'
+        run: make movetoapp
+
+      - name: publish to public repo
+        if: steps.check_version.outcome == 'success'
+        run: make movedisttopublic
+      - name: commit to dash
+        if: steps.check_version.outcome == 'success'
+        env:
+          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+        run: |
+          cd dash-repo
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add dist
+          git commit -m "update dist"
+          git remote -v
+          git push
+      - name: commit to app
+        if: steps.check_version.outcome == 'success'
+        env:
+          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+        run: |
+          cd repo
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add dist
+          git commit -m "update dist"
+          git remote -v
+          git push
+
+      - name: commit to public
+        if: steps.check_version.outcome == 'success'
+        env:
+          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+        run: |
+          cd public-repo
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add docs
+          git add dist
+          git commit -m "update dist"
+          git remote -v
+          git push
+
+      - name: release assets
+        if: steps.check_version.outcome == 'success'
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: |
+            dist/chrome-immersive-translate-${{ steps.set_var.outputs.version }}.zip
+            dist/firefox-immersive-translate-${{ steps.set_var.outputs.version }}.zip
+            dist/userscript/immersive-translate.user.js
+          tag: v${{ steps.set_var.outputs.version }}
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          generateReleaseNotes: true
+          commit: main
+          repo: next-translator
+      - name: Publish to Public repo
+        uses: ncipollo/release-action@v1
+        if: steps.check_version.outcome == 'success'
+        with:
+          artifacts: |
+            dist/chrome-immersive-translate-${{ steps.set_var.outputs.version }}.zip
+            dist/firefox-immersive-translate-${{ steps.set_var.outputs.version }}.zip
+            dist/userscript/immersive-translate.user.js
+          repo: immersive-translate
+          tag: v${{ steps.set_var.outputs.version }}
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          body: "See [ChangeLog](https://immersivetranslate.com/docs/CHANGELOG/)\n- [App Store for Safari](https://apps.apple.com/app/immersive-translate/id6447957425)\n- [Firefox Addon](https://addons.mozilla.org/zh-CN/firefox/addon/immersive-translate/)\n- [Chrome Store](https://chrome.google.com/webstore/detail/immersive-translate/bpoadfkcbjbfhfodiogcnhhhpibjhbnh)\n- [Edge Store](https://microsoftedge.microsoft.com/addons/detail/amkbmndfnliijdhojkpoglbnaaahippg)\n- [Userscript](https://download.immersivetranslate.com/immersive-translate.user.js)"
+          generateReleaseNotes: false
+          commit: main
+      # - run: cd dist/userscript && npm publish
+      #   if: steps.check_version.outcome == 'success'
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Build for store
+        if: steps.check_version.outcome == 'success'
+        run: make prod-buildall
+      # - name: "web-ext build"
+      #   id: web-ext-build
+      #   if: steps.check_version.outcome == 'success'
+      #   uses: kewisch/action-web-ext@v1
+      #   with:
+      #     cmd: build
+      #     source: dist/firefox
+      #     filename: "firefox-{name}-{version}.xpi"
+      - run: make zipsource
+      - uses: cardinalby/webext-buildtools-firefox-addons-action@v1
+        name: submit to firefox
+        with:
+          zipFilePath: "dist/firefox_store.zip"
+          sourcesZipFilePath: "dist/immersive-translate-source.zip"
+          extensionId: "{5efceaa7-f3a2-4e59-a54b-85319448e305}"
+          jwtIssuer: ${{ secrets.FIREFOX_API_KEY }}
+          jwtSecret: ${{ secrets.FIREFOX_API_SECRET }}
+      # - name: "web-ext sign"
+      #   if: steps.check_version.outcome == 'success'
+      #   id: web-ext-sign
+      #   uses: kewisch/action-web-ext@v1
+      #   with:
+      #     cmd: sign
+      #     source: ${{ steps.web-ext-build.outputs.target }}
+      #     channel: listed
+      #     apiKey: ${{ secrets.FIREFOX_API_KEY }}
+      #     apiSecret: ${{ secrets.FIREFOX_API_SECRET }}
+      #     timeout: 900000
+
+      - name: publish to stayfork
+        if: steps.check_version.outcome == 'success'
+        run: make uploadtostay
+        env:
+          STAYFORK_API_KEY: ${{ secrets.STAYFORK_API_KEY }}
+      - uses: wdzeng/edge-addon@v1
+        if: steps.check_version.outcome == 'success' &&  github.event.inputs.edge  == '1'
+        with:
+          product-id: d49a3368-918f-446f-8d8b-4dadb0f08e8e
+          zip-path: dist/edge_store.zip
+          client-id: ${{ secrets.EDGE_CLIENT_ID }}
+          client-secret: ${{ secrets.EDGE_CLIENT_SECRET }}
+          access-token-url: ${{ secrets.EDGE_ACCESS_TOKEN_URL }}
+
+      - name: Upload & release to chrome store
+        uses: mnao305/chrome-extension-upload@v4.0.1
+        if: steps.check_version.outcome == 'success' &&  github.event.inputs.chrome  == '1'
+        with:
+          file-path: dist/chrome_store.zip
+          extension-id: bpoadfkcbjbfhfodiogcnhhhpibjhbnh
+          client-id: ${{ secrets.GOOGLE_CLIENT_ID }}
+          client-secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+
+      - run: |
+          curl --location 'https://api.github.com/repos/immersive-translate/next-translator/dispatches' \
+          --header 'Content-Type: application/json' \
+          --header 'Authorization: Bearer ${{secrets.PERSONAL_GITHUB_TOKEN}}' \
+          --data '{
+            "event_type": "deploy-rule"
+          }'
