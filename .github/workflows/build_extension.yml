@@ -161,7 +161,7 @@ jobs:
           repo: immersive-translate
           tag: v${{ steps.set_var.outputs.version }}
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-          body: "See [ChangeLog](https://immersivetranslate.com/docs/CHANGELOG/)\n- [App Store for Safari](https://apps.apple.com/app/immersive-translate/id6447957425)\n- [Firefox Addon](https://addons.mozilla.org/zh-CN/firefox/addon/immersive-translate/)\n- [Chrome Store](https://chrome.google.com/webstore/detail/immersive-translate/bpoadfkcbjbfhfodiogcnhhhpibjhbnh)\n- [Edge Store](https://microsoftedge.microsoft.com/addons/detail/amkbmndfnliijdhojkpoglbnaaahippg)\n- [Userscript](https://download.immersivetranslate.com/immersive-translate.user.js)"
+          body: "See [ChangeLog](https://immersivetranslate.com/docs/CHANGELOG/)\nNote:  由于各商店审核时间不一致，所以对应的商店可能并不是最新版本，请耐心等待商店审核，或[手动下载安装包后安装最新版（大多数用户不推荐这样做）](https://immersivetranslate.com/docs/installation/#%E6%89%8B%E5%8A%A8%E5%AE%89%E8%A3%85-%E8%BF%BD%E8%B8%AA%E6%9C%80%E6%96%B0%E5%BC%80%E5%8F%91%E7%89%B9%E6%80%A7)。 \n\n- [App Store for Safari](https://apps.apple.com/app/immersive-translate/id6447957425)\n- [Firefox Addon](https://addons.mozilla.org/zh-CN/firefox/addon/immersive-translate/)\n- [Chrome Store](https://chrome.google.com/webstore/detail/immersive-translate/bpoadfkcbjbfhfodiogcnhhhpibjhbnh)\n- [Edge Store](https://microsoftedge.microsoft.com/addons/detail/amkbmndfnliijdhojkpoglbnaaahippg)\n- [Userscript](https://download.immersivetranslate.com/immersive-translate.user.js)"
           generateReleaseNotes: false
           commit: main
       # - run: cd dist/userscript && npm publish
