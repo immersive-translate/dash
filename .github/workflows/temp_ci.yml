@@ -1,7 +1,20 @@
-name: temp release
+name: build firefox
 on:
   workflow_dispatch:
-
+    inputs:
+      edge:
+        default: "0"
+        description: "is publish to edge"
+        type: string
+        required: false
+      chrome:
+        default: "0"
+        description: "is publish to chrome"
+        type: string
+        required: false
+  repository_dispatch:
+    types:
+      - build-nightly-extension
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,13 +23,9 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
         with:
-          ref:  move-domain
           repository: immersive-translate/next-translator
+          # ref: official
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-      - name: checkout to main and merge
-        run: |
-          git checkout -b main
-
       #https://stackoverflow.com/questions/61919141/read-json-file-in-github-actions
       - id: set_var
         run: |
@@ -36,7 +45,7 @@ jobs:
         if: steps.check_version.outcome == 'success'
         uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.31.1
+          deno-version: v1.34.3
       # - uses: actions/setup-node@v3
       #   if: steps.check_version.outcome == 'success'
       #   with:
@@ -54,75 +63,10 @@ jobs:
         run: |
           cp dist/chrome.zip dist/chrome-immersive-translate-${{ steps.set_var.outputs.version }}.zip
           cp dist/firefox.zip dist/firefox-immersive-translate-${{ steps.set_var.outputs.version }}.zip
-      - name: Clone public app repo
-        if: steps.check_version.outcome == 'success'
-        run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/app repo
-        env:
-          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      - name: get sum
+        run: sha256sum dist/firefox_store/content_script.js
 
-      - name: Clone public dash repo
+      - name: Build for store
         if: steps.check_version.outcome == 'success'
-        run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/dash dash-repo
-        env:
-          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-
-      - name: Clone public repo
-        if: steps.check_version.outcome == 'success'
-        run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/immersive-translate public-repo
-        env:
-          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-      - name: ls
-        run: ls -l /home/runner/work/dash/dash/dist/
-      - name: upload userscript to cloudflare r2
-        if: steps.check_version.outcome == 'success'
-        run: make uploadtocloudflare
-        env:
-          CLOUFLARE_AWS_ACCESS_KEY_ID: ${{ secrets.CLOUFLARE_AWS_ACCESS_KEY_ID }}
-          CLOUFLARE_AWS_SECRET_ACCESS_KEY: ${{ secrets.CLOUFLARE_AWS_SECRET_ACCESS_KEY }}
-          VERSION: ${{ steps.set_var.outputs.version }}
-
-      - name: publish options to dash
-        run: make movetodash
-      - name: publish to app
-        if: steps.check_version.outcome == 'success'
-        run: make movetoapp
-
-      - name: commit to dash
-        if: steps.check_version.outcome == 'success'
-        env:
-          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-        run: |
-          cd dash-repo
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          git add dist
-          git commit -m "update dist"
-          git remote -v
-          git push
-      - name: commit to app
-        if: steps.check_version.outcome == 'success'
-        env:
-          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-        run: |
-          cd repo
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          git add dist
-          git commit -m "update dist"
-          git remote -v
-          git push
-
-      - name: commit to public
-        if: steps.check_version.outcome == 'success'
-        env:
-          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-        run: |
-          cd public-repo
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          git add docs
-          git add dist
-          git commit -m "update dist"
-          git remote -v
-          git push
-
+        run: make prod-buildall
+      - run: make zipsource
