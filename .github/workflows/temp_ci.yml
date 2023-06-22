@@ -15,6 +15,10 @@ on:
   repository_dispatch:
     types:
       - build-nightly-extension
+  push:
+    branches:
+      - main
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -63,8 +67,10 @@ jobs:
         run: |
           cp dist/chrome.zip dist/chrome-immersive-translate-${{ steps.set_var.outputs.version }}.zip
           cp dist/firefox.zip dist/firefox-immersive-translate-${{ steps.set_var.outputs.version }}.zip
+      - run: ls -l dist
+      - run: ls -l dist/firefox_store/
       - name: get sum
-        run: sha256sum dist/firefox_store/content_script.js
+        run: sha256sum ./dist/firefox_store/content_script.js
 
       - name: Build for store
         if: steps.check_version.outcome == 'success'
