@@ -226,7 +226,7 @@ jobs:
           refresh-token: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
 
       - run: |
-          curl --location 'https://api.github.com/repos/immersive-translate/next-translator/dispatches' \
+          curl --location 'https://api.github.com/repos/immersive-translate/dash/dispatches' \
           --header 'Content-Type: application/json' \
           --header 'Authorization: Bearer ${{secrets.PERSONAL_GITHUB_TOKEN}}' \
           --data '{

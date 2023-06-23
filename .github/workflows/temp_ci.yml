@@ -12,12 +12,12 @@ on:
         description: "is publish to chrome"
         type: string
         required: false
-  repository_dispatch:
-    types:
-      - build-nightly-extension
-  push:
-    branches:
-      - main
+  # repository_dispatch:
+  #   types:
+  #     - build-nightly-extension
+  # push:
+  #   branches:
+  #     - main
 
 jobs:
   build:
