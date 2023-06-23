@@ -20,6 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     concurrency: nightly-build
     steps:
+      - name: Set BUILD_TIME
+        id: buildtime
+        run: echo "::set-output name=timestamp::$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+
       - name: Check out repository code
         uses: actions/checkout@v3
         with:
@@ -58,6 +62,8 @@ jobs:
       - name: Build for release zip file
         if: steps.check_version.outcome == 'success'
         run: RELEASE_ZIP=1 make prod-buildzip
+        env:
+          IMMERSIVE_TRANSLATE_BUILD_TIME: ${{ steps.buildtime.outputs.timestamp }}
       - name: Add Version to folders
         if: steps.check_version.outcome == 'success'
         run: |
@@ -88,6 +94,35 @@ jobs:
         run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/immersive-translate public-repo
         env:
           PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+
+      - name: Clone config repo
+        run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/config config-repo
+        if: steps.check_version.outcome == 'success'
+        env:
+          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+
+      - name: add buildinConfigUpdatedAt field to repo/dist/default_config.json
+        run: make generateconfig target=config-repo/dist/default_config.json
+        env:
+          IMMERSIVE_TRANSLATE_BUILD_TIME: ${{ steps.buildtime.outputs.timestamp }}
+      - name: commit to config
+        env:
+          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+        run: |
+          cd config-repo
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          # check is there is git tag with the same version
+          # if not then create a new tag
+          git add dist/default_config.json
+          git commit -m "update default_config.json"
+          echo v${{ steps.set_var.outputs.version }}
+          git tag -l | grep v${{ steps.set_var.outputs.version }} || echo "yes"
+          git tag -l | grep v${{ steps.set_var.outputs.version }} || git tag -a v${{ steps.set_var.outputs.version }} -m "v${{ steps.set_var.outputs.version }}"
+          git tag -l
+          git remote -v
+          git push origin --follow-tags
+
 
       - name: publish options to dash
         run: make movetodash
@@ -172,6 +207,8 @@ jobs:
       - name: Build for store
         if: steps.check_version.outcome == 'success'
         run: make prod-buildall
+        env:
+          IMMERSIVE_TRANSLATE_BUILD_TIME: ${{ steps.buildtime.outputs.timestamp }}
       # - name: "web-ext build"
       #   id: web-ext-build
       #   if: steps.check_version.outcome == 'success'
