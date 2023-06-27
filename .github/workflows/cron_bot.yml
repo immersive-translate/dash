@@ -69,12 +69,12 @@ jobs:
         id: source
         continue-on-error: true
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.CLOUFLARE_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CLOUFLARE_AWS_SECRET_ACCESS_KEY }}
           IM_DEEPL_AUTH_KEY: ${{secrets.IM_DEEPL_AUTH_KEY}}
           MASTODON_TOKENS: ${{secrets.MASTODON_TOKENS}}
-          AWS_DEFAULT_REGION: ${{secrets.AWS_DEFAULT_REGION}}
-          AWS_ENDPOINT: ${{secrets.AWS_ENDPOINT}}
+          AWS_DEFAULT_REGION: ${{secrets.CLOUFLARE_AWS_DEFAULT_REGION}}
+          AWS_ENDPOINT: ${{secrets.CLOUFLARE_AWS_ENDPOINT}}
           PRODUCTHUNT_TOKEN: ${{secrets.PRODUCTHUNT_TOKEN}}
           TRANSLATE_COUNT: ${{ github.event.inputs.translate_count }}
           TRANSLATE_TIMEOUT: ${{ github.event.inputs.translate_timeout }}
@@ -83,10 +83,10 @@ jobs:
       - name: upload files
         run: make prod-upload
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{secrets.AWS_DEFAULT_REGION}}
-          AWS_ENDPOINT: ${{secrets.AWS_ENDPOINT}}
+          AWS_ACCESS_KEY_ID: ${{ secrets.CLOUFLARE_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CLOUFLARE_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{secrets.CLOUFLARE_AWS_DEFAULT_REGION}}
+          AWS_ENDPOINT: ${{secrets.CLOUFLARE_AWS_ENDPOINT}}
       - name: upload temp folder to github action for debug
         uses: actions/upload-artifact@v3
         with:
