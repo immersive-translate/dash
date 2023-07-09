@@ -218,6 +218,15 @@ jobs:
       #     source: dist/firefox
       #     filename: "firefox-{name}-{version}.xpi"
       - run: make zipsource
+
+      - uses: cardinalby/webext-buildtools-firefox-addons-action@v1
+        name: submit beta to firefox
+        with:
+          zipFilePath: "dist/firefox_store_beta.zip"
+          sourcesZipFilePath: "dist/immersive-translate-source.zip"
+          extensionId: "{5efceaa7-f3a2-4e59-a54b-85319448e306}"
+          jwtIssuer: ${{ secrets.FIREFOX_API_KEY }}
+          jwtSecret: ${{ secrets.FIREFOX_API_SECRET }}
       - uses: cardinalby/webext-buildtools-firefox-addons-action@v1
         name: submit to firefox
         with:
