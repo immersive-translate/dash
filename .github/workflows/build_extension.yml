@@ -91,7 +91,7 @@ jobs:
 
       - name: Clone public repo
         if: steps.check_version.outcome == 'success'
-        run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/immersive-translate public-repo
+        run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/old-docs public-repo
         env:
           PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
 
