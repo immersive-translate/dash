@@ -14,10 +14,8 @@ jobs:
         with:
           repository: immersive-translate/site
           ref: develop
-          fetch-depth: 0
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-
-      - run: git checkout main && git merge develop
+      - run: git checkout -b main
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
