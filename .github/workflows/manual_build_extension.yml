@@ -126,7 +126,7 @@ jobs:
           extensionId: "{5efceaa7-f3a2-4e59-a54b-85319448e306}"
           jwtIssuer: ${{ secrets.FIREFOX_API_KEY }}
           jwtSecret: ${{ secrets.FIREFOX_API_SECRET }}
-      - uses: wdzeng/edge-addon@v1
+      - uses: wdzeng/edge-addon@v1.2.0
         if: steps.check_version.outcome == 'success' && github.event.inputs.edge == '1'
         with:
           product-id: d49a3368-918f-446f-8d8b-4dadb0f08e8e
