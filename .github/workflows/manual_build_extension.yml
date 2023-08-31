@@ -134,14 +134,14 @@ jobs:
       #     client-id: ${{ secrets.EDGE_CLIENT_ID }}
       #     client-secret: ${{ secrets.EDGE_CLIENT_SECRET }}
       #     access-token-url: ${{ secrets.EDGE_ACCESS_TOKEN_URL }}
-      - uses: inverse/edge-addon@v1.0.1
-        with:
-          product_id: d49a3368-918f-446f-8d8b-4dadb0f08e8
-          client_id: ${{ secrets.EDGE_CLIENT_ID }}
-          client_secret: ${{ secrets.EDGE_CLIENT_SECRET }}
-          access_token_url: ${{ secrets.EDGE_ACCESS_TOKEN_URL }}
-          zip: dist/edge_store.zip
-          notes: Bug fixes # Could be derived from release notes
+      # - uses: inverse/edge-addon@v1.0.1
+      #   with:
+      #     product_id: d49a3368-918f-446f-8d8b-4dadb0f08e8
+      #     client_id: ${{ secrets.EDGE_CLIENT_ID }}
+      #     client_secret: ${{ secrets.EDGE_CLIENT_SECRET }}
+      #     access_token_url: ${{ secrets.EDGE_ACCESS_TOKEN_URL }}
+      #     zip: dist/edge_store.zip
+      #     notes: Bug fixes # Could be derived from release notes
 
       - name: Upload & release to chrome store
         uses: mnao305/chrome-extension-upload@v4.0.1
