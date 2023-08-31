@@ -126,14 +126,22 @@ jobs:
           extensionId: "{5efceaa7-f3a2-4e59-a54b-85319448e306}"
           jwtIssuer: ${{ secrets.FIREFOX_API_KEY }}
           jwtSecret: ${{ secrets.FIREFOX_API_SECRET }}
-      - uses: wdzeng/edge-addon@v1.1.0
-        if: steps.check_version.outcome == 'success' && github.event.inputs.edge == '1'
+      # - uses: wdzeng/edge-addon@v1.1.0
+      #   if: steps.check_version.outcome == 'success' && github.event.inputs.edge == '1'
+      #   with:
+      #     product-id: d49a3368-918f-446f-8d8b-4dadb0f08e8e
+      #     zip-path: dist/edge_store.zip
+      #     client-id: ${{ secrets.EDGE_CLIENT_ID }}
+      #     client-secret: ${{ secrets.EDGE_CLIENT_SECRET }}
+      #     access-token-url: ${{ secrets.EDGE_ACCESS_TOKEN_URL }}
+      - uses: inverse/edge-addon@v1.0.1
         with:
-          product-id: d49a3368-918f-446f-8d8b-4dadb0f08e8e
-          zip-path: dist/edge_store.zip
-          client-id: ${{ secrets.EDGE_CLIENT_ID }}
-          client-secret: ${{ secrets.EDGE_CLIENT_SECRET }}
-          access-token-url: ${{ secrets.EDGE_ACCESS_TOKEN_URL }}
+          product_id: d49a3368-918f-446f-8d8b-4dadb0f08e8
+          client_id: ${{ secrets.EDGE_CLIENT_ID }}
+          client_secret: ${{ secrets.EDGE_CLIENT_SECRET }}
+          access_token_url: ${{ secrets.EDGE_ACCESS_TOKEN_URL }}
+          zip: dist/edge_store.zip
+          notes: Bug fixes # Could be derived from release notes
 
       - name: Upload & release to chrome store
         uses: mnao305/chrome-extension-upload@v4.0.1
