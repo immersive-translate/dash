@@ -106,7 +106,10 @@ jobs:
       #     apiKey: ${{ secrets.FIREFOX_API_KEY }}
       #     apiSecret: ${{ secrets.FIREFOX_API_SECRET }}
       #     timeout: 900000
-
+      - uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/
       - uses: cardinalby/webext-buildtools-firefox-addons-action@v1
         if: steps.check_version.outcome == 'success' && github.event.inputs.firefox == '1'
         name: submit to firefox
