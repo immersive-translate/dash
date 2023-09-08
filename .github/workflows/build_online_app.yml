@@ -1,13 +1,6 @@
-name: build options web page
+name: build online web app
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - "main"
-    paths:
-      - "pages/options.tsx"
-      - "userscript/options_entry.ts"
-      - "userscript/options/index.html"
 jobs:
   build:
     runs-on: ubuntu-latest
