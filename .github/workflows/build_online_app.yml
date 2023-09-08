@@ -28,6 +28,8 @@ jobs:
         run: make test
       - name: Build
         run: make prod-build
+      - name: ls
+        run: ls -l dist/userscript
 
 
       - name: Clone public app repo
@@ -76,6 +78,7 @@ jobs:
           cd repo
           ls -l
           pwd
+          ls -l dist
 
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
