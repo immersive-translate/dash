@@ -32,11 +32,6 @@ jobs:
         run: ls -l dist/userscript
 
 
-      - name: Clone public app repo
-        if: steps.check_version.outcome == 'success'
-        run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/app repo
-        env:
-          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
       # check version is 3 digits x.x.1-9 or x.x.0
       - name: Check version
         id: check_version
@@ -49,6 +44,10 @@ jobs:
             exit 1
           fi
 
+      - name: Clone public app repo
+        run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/app repo
+        env:
+          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
       - name: Clone public dash repo
         if: steps.check_version.outcome == 'success'
         run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/dash dash-repo
