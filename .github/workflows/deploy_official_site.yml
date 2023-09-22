@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   repository_dispatch:
     types:
-      - deploy-official-site 
+      - deploy-official-site
 jobs:
   deploy:
     name: Deploy to Cloudfalre Pages
@@ -23,7 +23,7 @@ jobs:
       - name: Build website
         run: npm i && cd official && npm run build
       - name: Publish to Cloudflare Pages
-        uses: cloudflare/pages-action@v1 
+        uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
           accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
