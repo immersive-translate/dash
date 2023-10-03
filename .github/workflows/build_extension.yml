@@ -2,6 +2,16 @@ name: extension nightly release
 on:
   workflow_dispatch:
     inputs:
+      firefox:
+        default: "1"
+        description: "is publish to firefox"
+        type: string
+        required: false
+      userscript:
+        default: "1"
+        description: "is publish to userscript"
+        type: string
+        required: false
       edge:
         default: "0"
         description: "is publish to edge"
@@ -249,6 +259,7 @@ jobs:
           jwtIssuer: ${{ secrets.FIREFOX_API_KEY }}
           jwtSecret: ${{ secrets.FIREFOX_API_SECRET }}
       - uses: cardinalby/webext-buildtools-firefox-addons-action@v1
+        if: steps.check_version.outcome == 'success' && github.event.inputs.edge  == '1'
         name: submit to firefox
         with:
           zipFilePath: "dist/firefox_store.zip"
