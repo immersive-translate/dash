@@ -29,6 +29,6 @@ jobs:
           apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
           accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
           projectName: develop-immersivetranslate-drafts
-          directory: drafts/build
+          directory: drafts/dist
           # Optional: Enable this if you want to have GitHub Deployments triggered
           # gitHubToken: ${{ secrets.GITHUB_TOKEN }}
