@@ -22,9 +22,15 @@ jobs:
           cache-dependency-path: ./package-lock.json
       - name: Build website
         run: npm i && make prod-buildreadit
+
       - name: Deploy
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
-          accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
-          workingDirectory: readit
+        run: make deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
+      # - name: Deploy
+      #   uses: cloudflare/wrangler-action@v3
+      #   with:
+      #     apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
+      #     accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
+      #     workingDirectory: readit
