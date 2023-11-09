@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           repository: funstory-ai/imt-backends
-          # ref: official
+          ref: develop
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
       - uses: actions/setup-node@v3
         with:
@@ -28,3 +28,4 @@ jobs:
           apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
           accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
           workingDirectory: readit
+          command: deploy
