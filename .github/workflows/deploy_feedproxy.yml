@@ -17,10 +17,12 @@ jobs:
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
       - uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
           cache-dependency-path: ./package-lock.json
 
+      - name: Install website
+        run: npm i
       - name: Deploy
         run: make prod-deployproxy
         env:
