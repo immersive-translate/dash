@@ -59,7 +59,7 @@ jobs:
         if: steps.check_version.outcome == 'success'
         uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.37.1
+          deno-version: v1.38.2
       # - uses: actions/setup-node@v3
       #   if: steps.check_version.outcome == 'success'
       #   with:
