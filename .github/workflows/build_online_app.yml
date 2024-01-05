@@ -32,45 +32,28 @@ jobs:
         run: ls -l dist/userscript
 
 
-      # check version is 3 digits x.x.1-9 or x.x.0
-      - name: Check version
-        id: check_version
-        continue-on-error: true
-        run: |
-          if [[ "${{ steps.set_var.outputs.version }}" =~ ^[0-9]+\.[0-9]+\.[1-9][0-9]*$ ]]; then
-            echo "Version is nightly"
-          else
-            echo "Version is release"
-            exit 1
-          fi
-
       - name: Clone public app repo
         run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/app repo
         env:
           PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
       - name: Clone public dash repo
-        if: steps.check_version.outcome == 'success'
         run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/dash dash-repo
         env:
           PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
 
       - name: Clone public repo
-        if: steps.check_version.outcome == 'success'
         run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/immersive-translate public-repo
         env:
           PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
       - name: publish to public repo
-        if: steps.check_version.outcome == 'success'
         run: make movedisttopublic
       - name: publish options to dash
         run: make movetodash
 
       - name: publish to app
-        if: steps.check_version.outcome == 'success'
         run: make movetoapp
 
       - name: commit to app
-        if: steps.check_version.outcome == 'success'
         env:
           PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
@@ -91,7 +74,6 @@ jobs:
           git remote -v
           git push
       - name: commit to dash
-        if: steps.check_version.outcome == 'success'
         env:
           PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
@@ -104,7 +86,6 @@ jobs:
           git push
 
       - name: commit to public
-        if: steps.check_version.outcome == 'success'
         env:
           PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
