@@ -14,7 +14,9 @@ jobs:
         with:
           repository: funstory-ai/imt-backends
           ref: develop
+
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      - run: git checkout -b main
       - uses: actions/setup-node@v3
         with:
           node-version: '20.x'
