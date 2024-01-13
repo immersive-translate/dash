@@ -32,10 +32,10 @@ jobs:
         run: ls -l dist/userscript
 
 
-      - name: Clone public app repo
-        run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/app repo
-        env:
-          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      # - name: Clone public app repo
+      #   run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/app repo
+      #   env:
+      #     PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
       - name: Clone public dash repo
         run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/dash dash-repo
         env:
@@ -50,29 +50,29 @@ jobs:
       - name: publish options to dash
         run: make movetodash
 
-      - name: publish to app
-        run: make movetoapp
+      # - name: publish to app
+      #   run: make movetoapp
 
-      - name: commit to app
-        env:
-          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-        run: |
-          cd repo
-          ls -l
-          pwd
-          ls -l dist
-
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          git status
-
-          git add dist
-
-          git status
-          git commit -m "update dist"
-          git status
-          git remote -v
-          git push
+      # - name: commit to app
+      #   env:
+      #     PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      #   run: |
+      #     cd repo
+      #     ls -l
+      #     pwd
+      #     ls -l dist
+      #
+      #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      #     git config --global user.name "github-actions[bot]"
+      #     git status
+      #
+      #     git add dist
+      #
+      #     git status
+      #     git commit -m "update dist"
+      #     git status
+      #     git remote -v
+      #     git push
       - name: commit to dash
         env:
           PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
