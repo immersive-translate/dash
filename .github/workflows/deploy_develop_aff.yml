@@ -1,0 +1,36 @@
+name: Deploy dev aff to Cloudflare worker
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types:
+      - deploy-develop-aff-site
+jobs:
+  deploy:
+    name: Deploy to Cloudfalre Pages
+    runs-on: ubuntu-latest
+    concurrency: build-develop-aff-site
+    steps:
+
+      - uses: actions/checkout@v3
+        with:
+          repository: immersive-translate/site
+          ref: develop
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org'
+          cache-dependency-path: ./package-lock.json
+      - name: Build website
+        run: npm i 
+      - name: Deploy
+        run: make deployaff
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
+      # - name: Deploy
+      #   uses: cloudflare/wrangler-action@v3
+      #   with:
+      #     apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
+      #     accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
+      #     workingDirectory: readit
