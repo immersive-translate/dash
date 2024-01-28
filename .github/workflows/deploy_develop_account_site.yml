@@ -1,6 +1,11 @@
 name: Deploy develop Account Site to Cloudflare Pages
 on:
   workflow_dispatch:
+    inputs:
+      branch:
+        default: "develop"
+        description: "branch"
+        type: string
   repository_dispatch:
     types:
       - deploy-develop-account-site
@@ -13,7 +18,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           repository: immersive-translate/site
-          ref: develop
+          ref: ${{github.event.inputs.branch}}
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
       # check to main branch
       - run: git checkout -b main
