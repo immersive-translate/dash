@@ -8,7 +8,7 @@ on:
         type: string
       worker:
         default: "false"
-        description: "branch"
+        description: "worker"
         type: string
   repository_dispatch:
     types:
