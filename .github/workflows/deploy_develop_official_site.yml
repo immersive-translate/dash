@@ -33,14 +33,6 @@ jobs:
           cache-dependency-path: ./package-lock.json
       - name: Build website
         run: npm i && cd official && npm run build:develop
-      - name: Deploy worker
-        if: github.event.inputs.worker == 'true'
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
-          accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
-          workingDirectory: ./account-shared
-          command: deploy worker.js
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
@@ -51,3 +43,12 @@ jobs:
           # Optional: Enable this if you want to have GitHub Deployments triggered
           # gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
+
+      - name: Deploy worker
+        if: github.event.inputs.worker == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
+          accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
+          workingDirectory: ./account-shared
+          command: deploy worker.js
