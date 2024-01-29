@@ -6,6 +6,10 @@ on:
         default: "develop"
         description: "branch"
         type: string
+      worker:
+        default: "false"
+        description: "branch"
+        type: string
   repository_dispatch:
     types:
       - deploy-develop-official-site
@@ -30,6 +34,7 @@ jobs:
       - name: Build website
         run: npm i && cd official && npm run build:develop
       - name: Deploy worker
+        if: github.event.inputs.worker == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
