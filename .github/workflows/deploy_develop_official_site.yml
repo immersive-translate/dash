@@ -6,10 +6,6 @@ on:
         default: "develop"
         description: "branch"
         type: string
-      worker:
-        default: "false"
-        description: "worker"
-        type: string
   repository_dispatch:
     types:
       - deploy-develop-official-site
@@ -33,6 +29,14 @@ jobs:
           cache-dependency-path: ./package-lock.json
       - name: Build website
         run: npm i && cd official && npm run build:develop
+
+      - name: Deploy worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
+          accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
+          workingDirectory: ./account-shared
+          command: deploy worker.js
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
@@ -44,11 +48,3 @@ jobs:
           # gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
 
-      - name: Deploy worker
-        if: github.event.inputs.worker == 'true'
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
-          accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
-          workingDirectory: ./account-shared
-          command: deploy worker.js
