@@ -27,14 +27,14 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache-dependency-path: ./package-lock.json
       - name: Build website
-        run: npm i && cd newapp && npm run build:test
+        run: npm i && cd app && npm run build:test
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
           accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
           projectName: develop-app
-          directory: newapp/dist
+          directory: app/dist
 
           # Optional: Enable this if you want to have GitHub Deployments triggered
           # gitHubToken: ${{ secrets.GITHUB_TOKEN }}
