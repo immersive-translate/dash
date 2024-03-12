@@ -1,0 +1,57 @@
+name: Deploy Blog to Cloudflare Pages
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        default: "main"
+        description: "branch"
+        type: string
+  repository_dispatch:
+    types:
+      - deploy-blog-site
+jobs:
+  deploy:
+    name: Deploy to Cloudfalre Pages
+    runs-on: ubuntu-latest
+    concurrency: build-blog-site
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: immersive-translate/ghost-blog
+          ref: ${{github.event.inputs.branch || 'main'}}
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      - run: git checkout -b main
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org'
+          cache-dependency-path: ./package-lock.json
+      - name: install 
+        run: npm i 
+
+      - name: Build zh website
+        run: make prod-zh
+        env:
+          GHOST_API_URL: ${{ secrets.GHOST_API_URL }}
+          GHOST_CONTENT_API_KEY: ${{ secrets.GHOST_CONTENT_API_KEY }}
+      - name: Build en website
+        run: make prod-en
+        env:
+          GHOST_API_URL: ${{ secrets.GHOST_API_URL }}
+          GHOST_CONTENT_API_KEY: ${{ secrets.GHOST_CONTENT_API_KEY }}
+      - name: Build ja website
+        run: make prod-ja
+        env:
+          GHOST_API_URL: ${{ secrets.GHOST_API_URL }}
+          GHOST_CONTENT_API_KEY: ${{ secrets.GHOST_CONTENT_API_KEY }}
+
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
+          accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
+          projectName: en-blog
+          directory: dist
+
+          # Optional: Enable this if you want to have GitHub Deployments triggered
+          # gitHubToken: ${{ secrets.GITHUB_TOKEN }}
