@@ -1,0 +1,38 @@
+name: Deploy Develop Start Usage
+on:
+  # Trigger the workflow every time you push to the `main` branch
+  # Using a different branch name? Replace `main` with your branch’s name
+  # Allows you to run this workflow manually from the Actions tab on GitHub.
+  workflow_dispatch:
+
+  repository_dispatch:
+    types:
+      - deply-develop-start-site
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: immersive-translate/site
+          ref: develop
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      # - run: cd ./start-usage && pwd && ls -a
+      - run: git checkout -b main
+      - run: pwd
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: ./start-usage/package-lock.json
+      - run: rm -rf package.json && cd account-shared && npm i && cd ../start-usage && npm i
+      - run: cd start-usage && npm run build
+      - run: pwd && ls -l
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@v1 
+        with:
+          apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
+          accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
+          projectName: develop-onboarding
+          directory: start-usage/dist
