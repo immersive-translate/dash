@@ -32,7 +32,7 @@ jobs:
           cache-dependency-path: ./start-usage/package-lock.json
       - run: rm -rf package.json && cd account-shared && npm i && cd ../start-usage && npm i
       - run: cd start-usage && npm run build
-      - run: pwd && ls -l
+      - run: pwd && ls -l && cd start-usage/dist && ls -l
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1 
         with:
