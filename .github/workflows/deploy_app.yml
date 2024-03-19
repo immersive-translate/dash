@@ -21,7 +21,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache-dependency-path: ./package-lock.json
       - name: Build website
-        run: npm i && cd app && npm run build:test
+        run: npm i && cd app && npm run build
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
