@@ -1,6 +1,11 @@
 name: Deploy App Site to Cloudflare Pages
 on:
   workflow_dispatch:
+    inputs:
+      branch:
+        default: "main"
+        description: "branch"
+        type: string
   repository_dispatch:
     types:
       - deploy-app-site
@@ -13,8 +18,12 @@ jobs:
       - uses: actions/checkout@v3
         with:
           repository: immersive-translate/site
-          ref: main
+          ref: ${{github.event.inputs.branch || 'main'}}
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+
+            # if branch not main
+      - if: ${{ github.event.inputs.branch && github.event.inputs.branch != 'main' }}
+        run: git checkout -b main
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
