@@ -33,7 +33,7 @@ jobs:
         with:
           apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
           accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
-          projectName: develop-app
+          projectName: develop-app3
           directory: app/dist
 
           # Optional: Enable this if you want to have GitHub Deployments triggered
