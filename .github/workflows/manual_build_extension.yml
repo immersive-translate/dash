@@ -68,7 +68,7 @@ jobs:
         if: steps.check_version.outcome == 'success'
         uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.38.2
+          deno-version: v1.41.3
       # - uses: actions/setup-node@v3
       #   if: steps.check_version.outcome == 'success'
       #   with:
@@ -178,7 +178,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.38.2
+          deno-version: v1.41.3
       - name: Test
         run: make test
       - run: make testflight
