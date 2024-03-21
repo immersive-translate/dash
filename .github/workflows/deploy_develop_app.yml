@@ -26,8 +26,17 @@ jobs:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
           cache-dependency-path: ./package-lock.json
-      - name: Build website
-        run: npm i && cd app && npm run build:test
+      - name: install website
+        run: npm i 
+      - name: build app
+        run: make buildtestapp
+      - name: Publish Static to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
+          accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
+          projectName: test-app-static
+          directory: app/static-dist
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
