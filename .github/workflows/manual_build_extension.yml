@@ -157,7 +157,7 @@ jobs:
           refresh-token: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
           publish: false
   safari:
-    runs-on: macos-latest
+    runs-on: macos-14
     timeout-minutes: 30
     concurrency: safari-build
     if: github.event.inputs.safari == '1'
