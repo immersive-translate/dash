@@ -34,7 +34,7 @@ jobs:
         with:
           apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
           accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
-          projectName: ai
+          projectName: ai-test
           directory: ai/build
           # Optional: Enable this if you want to have GitHub Deployments triggered
           # gitHubToken: ${{ secrets.GITHUB_TOKEN }}
