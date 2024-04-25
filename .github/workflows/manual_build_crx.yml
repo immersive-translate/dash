@@ -25,7 +25,7 @@ jobs:
         with:
           deno-version: v1.41.3
       - name: set crx version and upload crx to cloudflare r2
-        run: make crx crx_version=github.event.inputs.chrome
+        run: make crx crx_version=${{ github.event.inputs.chrome }}
         env:
           CLOUFLARE_AWS_ACCESS_KEY_ID: ${{ secrets.CLOUFLARE_AWS_ACCESS_KEY_ID }}
           CLOUFLARE_AWS_SECRET_ACCESS_KEY: ${{ secrets.CLOUFLARE_AWS_SECRET_ACCESS_KEY }}
