@@ -28,7 +28,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache-dependency-path: ./package-lock.json
       - name: Clone prompts repository
-        run: git clone git@github.com:TaoLoading/test-prompt.git
+        run: git clone https://github.com/TaoLoading/test-prompt.git
       - name: Build website
         run: npm i && cd ai && npm run build
       - name: Publish to Cloudflare Pages
