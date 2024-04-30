@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        default: "feat/ai"
+        default: "develop"
         description: "branch"
         type: string
   repository_dispatch:
