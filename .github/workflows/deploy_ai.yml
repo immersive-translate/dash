@@ -26,6 +26,7 @@ jobs:
         working-directory: ./
         env:
           PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      - run: make pulli18ns
       - name: Build website
         run: npm i && cd ai && npm run build
       - name: Publish to Cloudflare Pages
