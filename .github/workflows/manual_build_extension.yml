@@ -77,6 +77,8 @@ jobs:
       - name: Test
         if: steps.check_version.outcome == 'success'
         run: make test
+      - name: Test i18n
+        run: make testi18n
       - name: Build
         if: steps.check_version.outcome == 'success'
         run: make prod-buildall
