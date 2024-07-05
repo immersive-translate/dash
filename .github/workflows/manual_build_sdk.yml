@@ -1,0 +1,69 @@
+name: Manual release
+on:
+  workflow_dispatch:
+    inputs:
+      jssdk:
+        default: "0"
+        description: "upload js sdk"
+        type: string
+        required: false
+      branch:
+        default: "feat/js-sdk"
+        description: "branch name"
+        type: string
+        required: false
+  # push:
+  #   branches:
+  #     - safari-ci-test
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    concurrency: manual-build
+    if: github.event.inputs.chrome == '1' || github.event.inputs.firefox == '1' || github.event.inputs.edge == '1'
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+        with:
+          repository: immersive-translate/extension
+          ref: ${{github.event.inputs.branch || 'feat/js-sdk'}}
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      #https://stackoverflow.com/questions/61919141/read-json-file-in-github-actions
+      - id: set_var
+        run: |
+          content=`cat ./manifest.json`
+          echo "::set-output name=version::$(echo $content | jq -r '.version')"
+      # check version is 3 digits x.x.1-9 or x.x.0
+      - name: Check version
+        id: check_version
+        continue-on-error: true
+        run: |
+          if [[ "${{ github.event.inputs.force  }}" == "1" ]]; then
+            echo "force to publish"
+          elif [[ "${{ steps.set_var.outputs.version }}" =~ ^[0-9]+\.[0-9]+\.[1-9][0-9]*$ ]]; then
+            echo "Version is nightly"
+          else
+            echo "Version is release"
+          fi
+      - name: Setup Deno
+        if: steps.check_version.outcome == 'success'
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.41.3
+      # - uses: actions/setup-node@v3
+      #   if: steps.check_version.outcome == 'success'
+      #   with:
+      #     node-version: '16.x'
+      #     registry-url: 'https://registry.npmjs.org'
+      - name: Test
+        if: steps.check_version.outcome == 'success'
+        run: make test
+      - name: Build
+        if: steps.check_version.outcome == 'success'
+        run: make prod-buildjssdk
+      - name: upload jssdk to cloudflare r2
+        if: steps.check_version.outcome == 'success'
+        run: make uploadjssdk
+        env:
+          CLOUFLARE_AWS_ACCESS_KEY_ID: ${{ secrets.CLOUFLARE_AWS_ACCESS_KEY_ID }}
+          CLOUFLARE_AWS_SECRET_ACCESS_KEY: ${{ secrets.CLOUFLARE_AWS_SECRET_ACCESS_KEY }}
+          VERSION: ${{ steps.set_var.outputs.version }}
