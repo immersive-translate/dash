@@ -89,6 +89,14 @@ jobs:
           CLOUFLARE_AWS_ACCESS_KEY_ID: ${{ secrets.CLOUFLARE_AWS_ACCESS_KEY_ID }}
           CLOUFLARE_AWS_SECRET_ACCESS_KEY: ${{ secrets.CLOUFLARE_AWS_SECRET_ACCESS_KEY }}
           VERSION: ${{ steps.set_var.outputs.version }}
+
+      - name: upload jssdk to cloudflare r2
+        if: steps.check_version.outcome == 'success'
+        run: make uploadjssdk
+        env:
+          CLOUFLARE_AWS_ACCESS_KEY_ID: ${{ secrets.CLOUFLARE_AWS_ACCESS_KEY_ID }}
+          CLOUFLARE_AWS_SECRET_ACCESS_KEY: ${{ secrets.CLOUFLARE_AWS_SECRET_ACCESS_KEY }}
+          VERSION: ${{ steps.set_var.outputs.version }}
       # - name: Clone public app repo
       #   if: steps.check_version.outcome == 'success'
       #   run: git clone https://$PERSONAL_GITHUB_TOKEN@github.com/immersive-translate/app repo

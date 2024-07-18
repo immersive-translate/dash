@@ -8,7 +8,7 @@ on:
         type: string
         required: false
       branch:
-        default: "feat/js-sdk"
+        default: "main"
         description: "branch name"
         type: string
         required: false
