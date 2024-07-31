@@ -10,7 +10,7 @@ on:
     types:
       - deploy-develop-app-site
 jobs:
-  deploy:
+  build:
     name: Deploy to Cloudfalre Pages
     runs-on: ubuntu-latest
     concurrency: build-dev-app-site

@@ -5,7 +5,7 @@ on:
     types:
       - deploy-prod-readit-site
 jobs:
-  deploy:
+  build:
     name: Deploy to Cloudfalre Pages
     runs-on: ubuntu-latest
     concurrency: build-prod-readit-site

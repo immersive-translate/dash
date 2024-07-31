@@ -5,7 +5,7 @@ on:
     types:
       - deploy-cn-site
 jobs:
-  deploy:
+  build:
     name: Deploy to Cloudfalre Pages
     runs-on: ubuntu-latest
     concurrency: build-cn-site

@@ -7,7 +7,7 @@ on:
     paths:
       - 'dist/**'
 jobs:
-  deploy:
+  build:
     name: Deploy to Cloudflare Pages
     runs-on: ubuntu-latest
     concurrency: build-web
