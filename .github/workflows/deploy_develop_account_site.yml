@@ -13,7 +13,6 @@ jobs:
   deploy:
     name: Deploy to Cloudfalre Pages
     runs-on: ubuntu-latest
-    concurrency: build-dev-account-site
     steps:
       - uses: actions/checkout@v3
         with:
