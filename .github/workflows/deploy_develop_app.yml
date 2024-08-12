@@ -38,7 +38,7 @@ jobs:
           projectName: test-app-static
           directory: app/static-dist
       - name: Upload R2
-        run: DEPLOYMENT_STAGE=test FOLDER=./app/build/ ID=app make upload
+        run: DEPLOYMENT_STAGE=test FOLDER=./app/dist/ ID=app make upload
         env:
           CLOUFLARE_AWS_ACCESS_KEY_ID: ${{secrets.CLOUFLARE_AWS_ACCESS_KEY_ID}}
           CLOUFLARE_AWS_SECRET_ACCESS_KEY: ${{secrets.CLOUFLARE_AWS_SECRET_ACCESS_KEY}}
