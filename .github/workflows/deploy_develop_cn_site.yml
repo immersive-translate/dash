@@ -29,6 +29,12 @@ jobs:
           cache-dependency-path: ./package-lock.json
       - name: Build website
         run: npm i && cd cn && npm run build:develop
+      - name: Upload R2
+        run: DEPLOYMENT_STAGE=test FOLDER=./cn/build/ ID=cn make upload
+        env:
+          CLOUFLARE_AWS_ACCESS_KEY_ID: ${{secrets.CLOUFLARE_AWS_ACCESS_KEY_ID}}
+          CLOUFLARE_AWS_SECRET_ACCESS_KEY: ${{secrets.CLOUFLARE_AWS_SECRET_ACCESS_KEY}}
+          CLOUFLARE_AWS_ENDPOINT: ${{secrets.CLOUFLARE_AWS_ENDPOINT}}
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
