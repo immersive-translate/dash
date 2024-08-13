@@ -29,7 +29,7 @@ jobs:
           path: dash-repo
 
       - name: Upload R2
-        run: DEPLOYMENT_STAGE=test FOLDER=./dash-repo/dist/ ID=dash make upload
+        run: DEPLOYMENT_STAGE=production FOLDER=./dash-repo/dist/ ID=dash make upload
         env:
           CLOUFLARE_AWS_ACCESS_KEY_ID: ${{secrets.CLOUFLARE_AWS_ACCESS_KEY_ID}}
           CLOUFLARE_AWS_SECRET_ACCESS_KEY: ${{secrets.CLOUFLARE_AWS_SECRET_ACCESS_KEY}}
