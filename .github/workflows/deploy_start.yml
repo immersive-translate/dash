@@ -25,7 +25,7 @@ jobs:
           node-version: 18
           cache: 'npm'
           cache-dependency-path: ./start-usage/package-lock.json
-      - run: rm -rf package.json && cd extension-utils && npm i && cd ../account-shared && npm i && cd ../start-usage && npm i
+      - run: npm i && cd start-usage && npm i
       - run: cd start-usage && npm run build
       - run: pwd && ls -l
       - name: Upload R2
