@@ -19,7 +19,7 @@ jobs:
         with:
           repository: immersive-translate/site
             # todo
-          ref: ${{github.event.inputs.branch || 'feat/s3'}}
+          ref: ${{github.event.inputs.branch || 'develop'}}
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
       # check to main branch
       - run: git checkout -b main
