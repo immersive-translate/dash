@@ -29,7 +29,12 @@ jobs:
           cache-dependency-path: ./package-lock.json
       - name: Build website
         run: npm i && cd account &&  npm run build:develop
-
+      - name: Upload R2
+        run: DEPLOYMENT_STAGE=test FOLDER=./account/dist/ ID=account make upload
+        env:
+          CLOUFLARE_AWS_ACCESS_KEY_ID: ${{secrets.CLOUFLARE_AWS_ACCESS_KEY_ID}}
+          CLOUFLARE_AWS_SECRET_ACCESS_KEY: ${{secrets.CLOUFLARE_AWS_SECRET_ACCESS_KEY}}
+          CLOUFLARE_AWS_ENDPOINT: ${{secrets.CLOUFLARE_AWS_ENDPOINT}}
       - name: Deploy worker
         uses: cloudflare/wrangler-action@v3
         with:
