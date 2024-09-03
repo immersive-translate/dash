@@ -25,7 +25,7 @@ jobs:
           node-version: 18
           cache: 'npm'
           cache-dependency-path: ./start-usage/package-lock.json
-      - run: rm -rf package.json && cd extension-utils && npm i && cd ../account-shared && npm i && cd ../start-usage && npm i
+      - run: npm i && cd start-usage && npm i
       - run: cd start-usage && npm run build
       - run: pwd && ls -l
       - name: Upload R2
@@ -34,11 +34,3 @@ jobs:
           CLOUFLARE_AWS_ACCESS_KEY_ID: ${{secrets.CLOUFLARE_AWS_ACCESS_KEY_ID}}
           CLOUFLARE_AWS_SECRET_ACCESS_KEY: ${{secrets.CLOUFLARE_AWS_SECRET_ACCESS_KEY}}
           CLOUFLARE_AWS_ENDPOINT: ${{secrets.CLOUFLARE_AWS_ENDPOINT}}
-      - name: Publish to Cloudflare Pages
-        uses: cloudflare/pages-action@v1 
-        with:
-          apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
-          accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
-          projectName: onboarding
-          directory: dist
-          workingDirectory: start-usage

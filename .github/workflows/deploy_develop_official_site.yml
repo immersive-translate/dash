@@ -42,15 +42,3 @@ jobs:
           accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
           workingDirectory: ./account-shared
           command: deploy worker.js
-      - name: Publish to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          workingDirectory: official
-          apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
-          accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
-          projectName: develop-immersivetranslate
-          directory: build
-          # Optional: Enable this if you want to have GitHub Deployments triggered
-          # gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-
-
