@@ -157,7 +157,7 @@ jobs:
           client-id: ${{ secrets.GOOGLE_CLIENT_ID }}
           client-secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           refresh-token: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
-          publish: false
+          publish: true
   safari:
     runs-on: macos-14
     timeout-minutes: 30
