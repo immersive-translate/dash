@@ -1,0 +1,30 @@
+name: Deploy download Site to Cloudflare Worker
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types:
+      - deploy-download
+jobs:
+  build:
+    name: Deploy to Cloudfalre Pages
+    runs-on: ubuntu-latest
+    concurrency: build-account-site
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: immersive-translate/site
+          # ref: account
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org'
+          cache-dependency-path: ./package-lock.json
+
+      - name: Deploy worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
+          accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
+          workingDirectory: ./download
+          command: deploy --env prod
