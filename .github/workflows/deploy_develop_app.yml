@@ -30,13 +30,6 @@ jobs:
         run: npm i 
       - name: build app
         run: make buildtestapp
-      - name: Publish Static to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
-          accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
-          projectName: test-app-static
-          directory: app/static-dist
       - name: Upload R2
         run: DEPLOYMENT_STAGE=test FOLDER=./app/dist/ ID=app make upload
         env:
