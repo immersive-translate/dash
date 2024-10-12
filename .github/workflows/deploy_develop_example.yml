@@ -1,0 +1,31 @@
+name: build develop example web page
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types:
+      - deploy-develop-example-site
+  # push:
+  #   branches:
+  #     - "main"
+  #   paths:
+  #     - "example/**"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    concurrency: options-web
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+        with:
+          repository: immersive-translate/extension
+          ref: develop
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      #https://stackoverflow.com/questions/61919141/read-json-file-in-github-actions
+      - run: git checkout -b main
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.IMMERSIVE_CLOUDFLARE_API_TOKEN }}
+          accountId: ${{secrets.IMMERSIVE_CLOUDFLARE_ACCOUNT_ID}}
+          projectName: example
+          directory: example
